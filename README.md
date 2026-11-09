@@ -7,37 +7,62 @@ A magical, AI-powered web application designed to help children explore the wond
 
 ## ✨ Features
 
-- **🪄 Magic Analysis**: Instantly analyzes English sentences.
+### Core Learning
+- **🪄 Magic Analysis**: Instantly analyzes English sentences via AI.
 - **🇨🇳 Translation**: Provides natural, child-friendly Chinese translations.
 - **⭐ Cool Phrases**: Identifies idioms, collocations, and phrases.
 - **📖 Grammar Check**: Explains grammar rules in simple terms.
-- **🖨️ PDF Export**: Saves the analysis as a beautiful PDF for printing or studying later.
-- **☁️ Dreamy UI**: A colorful, engaging interface designed for kids.
+- **🎯 Quiz Mode**: AI-generated 5-question quiz based on the analyzed text, with instant scoring and explanations.
+
+### Study Tools
+- **🔊 Read Aloud**: Text-to-speech (Web Speech API) for the original text and every phrase — great for listening and repeating.
+- **🎤 Voice Input**: Speak in English to fill the input box (Chrome / Edge).
+- **📖 History**: All past analyses are saved locally and can be reopened anytime.
+- **⭐ Vocabulary Book**: Star any phrase to save it, review saved words with pronunciation support.
+
+### Platform
+- **🖨️ Export**: Download analysis as TXT or a beautiful PDF.
+- **📱 PWA**: Installable on phone/desktop, works offline for cached pages.
+- **🔒 Secure API Key**: Gemini key lives on the server side only, never exposed to the browser.
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React 19, TypeScript
-- **Styling**: Tailwind CSS
-- **AI Engine**: Google Gemini API (`gemini-3-flash-preview`)
-- **PDF Generation**: `html2pdf.js`
-- **Build Tool**: Vite
+| Layer | Technology |
+|-------|------------|
+| Frontend | React 19, TypeScript |
+| Styling | Tailwind CSS (proper PostCSS build) |
+| Backend API | Node.js + Express (`server/index.js`) |
+| AI Engine | Google Gemini API (`gemini-2.0-flash`) |
+| Speech | Web Speech API (TTS + SpeechRecognition) |
+| PDF Generation | `html2pdf.js` |
+| PWA | manifest.json + Service Worker |
+| Build Tool | Vite |
+
+## 🏗️ Architecture
+
+```
+Browser (React SPA)
+    │
+    ├─ /api/analyze ──► Express Server ──► Google Gemini
+    │                    (holds API_KEY)
+    └─ /api/quiz ─────►
+```
+
+The Express server acts as a secure proxy: it reads `GEMINI_API_KEY` from environment variables at runtime and forwards requests to Gemini. In development, Vite proxies `/api` to the server. In production, the same server serves both the static build and the API.
 
 ## 🚀 Getting Started
 
-Follow these steps to run the project locally.
-
 ### Prerequisites
 
-- Node.js (v18 or higher)
-- npm or yarn
-- A Google Gemini API Key (Get it [here](https://aistudio.google.com/))
+- Node.js (v20+)
+- A Google Gemini API Key — get it [here](https://aistudio.google.com/)
 
 ### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/english-explorer-kids.git
-   cd english-explorer-kids
+   git clone https://github.com/sangyan123/english-study.git
+   cd english-study
    ```
 
 2. **Install dependencies**
@@ -45,37 +70,50 @@ Follow these steps to run the project locally.
    npm install
    ```
 
-3. **Configure Environment**
-   - Create a `.env` file in the root directory.
+3. **Configure environment**
+   - Copy `.env.example` to `.env`:
+     ```bash
+     cp .env.example .env
+     ```
    - Add your API key:
      ```env
-     API_KEY=your_actual_api_key_here
+     GEMINI_API_KEY=your_actual_api_key_here
      ```
 
-4. **Run the App**
+4. **Run the app**
    ```bash
    npm run dev
    ```
-   The app will open at `http://localhost:3000`.
+   This starts both:
+   - API server → `http://localhost:3002`
+   - Vite dev client → `http://localhost:3000` (auto-opens browser)
 
-## 📦 Building for Production
+## 📜 Available Scripts
 
-To create a production-ready build:
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Start API server + Vite dev client together |
+| `npm run build` | Type-check (tsc) + production build to `dist/` |
+| `npm start` | Serve production build + API on one port |
+
+## 📦 Production
 
 ```bash
 npm run build
+npm start
 ```
 
-The output will be in the `dist` folder. You can deploy this folder to any static hosting service.
+The Express server will serve the `dist/` folder and handle API routes on the same port (default `3002`, configurable via `PORT`).
 
-## ☁️ Deployment
+### Deploying to a Node host (Render / Railway / Fly.io)
 
-### Vercel / Netlify
+1. Set `GEMINI_API_KEY` in the host's environment variables.
+2. Build command: `npm run build`
+3. Start command: `npm start`
 
-1. Push your code to GitHub.
-2. Import the project into Vercel or Netlify.
-3. **Important**: Add your `API_KEY` in the project's Environment Variables settings in the Vercel/Netlify dashboard.
-4. The build command is `npm run build` and the output directory is `dist`.
+### Deploying frontend-only to Vercel / Netlify
+
+⚠️ **Not recommended** — a static-only deployment still needs the API proxy. Use a serverless function or a Node host as above to keep your API key safe.
 
 ## 📄 License
 
