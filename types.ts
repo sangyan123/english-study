@@ -6,14 +6,38 @@ export interface GrammarPoint {
 export interface Phrase {
   text: string;
   meaning: string;
-  type: string; // e.g., "Idiom", "Phrasal Verb", "Collocation"
+  type: string;
 }
 
 export interface AnalysisResult {
   translation: string;
   grammarPoints: GrammarPoint[];
   phrases: Phrase[];
-  encouragement: string; // A short encouraging message for the kid
+  encouragement: string;
+}
+
+export interface QuizQuestion {
+  question: string;
+  options: string[];
+  correctIndex: number;
+  explanation: string;
+}
+
+export interface QuizResult {
+  questions: QuizQuestion[];
+}
+
+export interface HistoryEntry {
+  id: string;
+  inputText: string;
+  result: AnalysisResult;
+  timestamp: number;
+}
+
+export interface VocabEntry {
+  phrase: Phrase;
+  sourceText: string;
+  savedAt: number;
 }
 
 export enum AppState {
